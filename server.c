@@ -228,7 +228,7 @@ int main() {
     }
 
     printTheMap(numberOfObstacles, numberOfHunters, numberOfPreys, obstacles, hunters, preys);
-
+    fflush(stdout);
     /* END OF INPUT SECTION */
     /**********************************************************************************/
     /* CREATE ALL PLAYERS */
@@ -320,7 +320,7 @@ int main() {
     int total = numberOfHunters+numberOfPreys;
     int m = total+3;
     int gameOver = 0;
-
+    if(total != 0)
     while(!gameOver) {
         
         FD_ZERO(&readset);
@@ -361,7 +361,7 @@ int main() {
                         //updateTheMap(numberOfObstacles, numberOfHunters, numberOfPreys, obstacles, hunters, preys);
 
                         printTheMap(numberOfObstacles, numberOfHunters, numberOfPreys, obstacles, hunters, preys);
-                        
+                        fflush(stdout);
                     }
                     updateTheMap(numberOfObstacles, numberOfHunters, numberOfPreys, obstacles, hunters, preys);
 
@@ -422,7 +422,7 @@ int main() {
                         }
 
                         printTheMap(numberOfObstacles, numberOfHunters, numberOfPreys, obstacles, hunters, preys);
-
+                        fflush(stdout);
                     }
                     updateTheMap(numberOfObstacles, numberOfHunters, numberOfPreys, obstacles, hunters, preys);
 
