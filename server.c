@@ -109,6 +109,10 @@ int neighborNumberForHunter(coordinate pos, coordinate *result) {
         result[count].y = y-1;
         count++;
     }
+    for(int i=count; i<4; i++){
+        result[count].x = -1;
+        result[count].y = -1;
+    }
     return count;
 }
 
@@ -137,11 +141,17 @@ int neighborNumberForPrey(coordinate pos, coordinate *result) {
         result[count].y = y-1;
         count++;
     }
+    for(int i=count; i<4; i++){
+        result[count].x = -1;
+        result[count].y = -1;
+    }
     return count;
 }
 
 int isValidMoveForHunter(coordinate nextPos) {
-    return (theMap[nextPos.x][nextPos.y] != 'X' && theMap[nextPos.x][nextPos.y] != 'H');
+    if (theMap[nextPos.x][nextPos.y] != 'X' && theMap[nextPos.x][nextPos.y] != 'H')
+        return 1;
+    return 0;
 }
 
 int isValidMoveForPrey(coordinate nextPos) {
@@ -218,7 +228,7 @@ int main() {
     }
 
     printTheMap(numberOfObstacles, numberOfHunters, numberOfPreys, obstacles, hunters, preys);
-
+    fflush(stdout);
     /* END OF INPUT SECTION */
     /**********************************************************************************/
     /* CREATE ALL PLAYERS */
@@ -310,7 +320,7 @@ int main() {
     int total = numberOfHunters+numberOfPreys;
     int m = total+3;
     int gameOver = 0;
-
+    if(total != 0)
     while(!gameOver) {
         
         FD_ZERO(&readset);
@@ -330,12 +340,11 @@ int main() {
                     read(hunters[i].fd, &msgReceived, sizeof(server_message));
 
                     if(isValidMoveForHunter(msgReceived.move_request)){
-                        
                         hunters[i].pos.x=msgReceived.move_request.x; 
                         hunters[i].pos.y=msgReceived.move_request.y;
                         hunters[i].energy--;
-                        updateTheMap(numberOfObstacles, numberOfHunters, numberOfPreys, obstacles, hunters, preys);
                         if(didHunterEatPrey(hunters[i].pos)){
+                            updateTheMap(numberOfObstacles, numberOfHunters, numberOfPreys, obstacles, hunters, preys);
                             int foundPrey = findPlayer(hunters[i].pos, numberOfPreys, preys);
                             hunters[i].energy += preys[foundPrey].energy;
                             preys[foundPrey].isAlive = 0;
@@ -349,10 +358,12 @@ int main() {
                             kill(hunters[i].pid, SIGTERM);
                             waitpid(hunters[i].pid, &status, WNOHANG);
                         }
-                        updateTheMap(numberOfObstacles, numberOfHunters, numberOfPreys, obstacles, hunters, preys);
+                        //updateTheMap(numberOfObstacles, numberOfHunters, numberOfPreys, obstacles, hunters, preys);
 
-                        //printTheMap(numberOfObstacles, numberOfHunters, numberOfPreys, obstacles, hunters, preys);
+                        printTheMap(numberOfObstacles, numberOfHunters, numberOfPreys, obstacles, hunters, preys);
+                        fflush(stdout);
                     }
+                    updateTheMap(numberOfObstacles, numberOfHunters, numberOfPreys, obstacles, hunters, preys);
 
                     if(hunters[i].isAlive){
                         server_message msg;
@@ -410,11 +421,11 @@ int main() {
                             waitpid(preys[i].pid, &status, WNOHANG);
                         }
 
+                        printTheMap(numberOfObstacles, numberOfHunters, numberOfPreys, obstacles, hunters, preys);
+                        fflush(stdout);
                     }
                     updateTheMap(numberOfObstacles, numberOfHunters, numberOfPreys, obstacles, hunters, preys);
 
-                    //printTheMap(numberOfObstacles, numberOfHunters, numberOfPreys, obstacles, hunters, preys);
-                        
                     server_message msg;
                     msg.pos.x = preys[i].pos.x;
                     msg.pos.y = preys[i].pos.y;
@@ -427,8 +438,8 @@ int main() {
 
                 }
         }
-        if(!gameOver)
-        printTheMap(numberOfObstacles, numberOfHunters, numberOfPreys, obstacles, hunters, preys);
+        //if(!gameOver)
+        //printTheMap(numberOfObstacles, numberOfHunters, numberOfPreys, obstacles, hunters, preys);
     }
 
     /* END OF THE LOOP */
